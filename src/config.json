@@ -1,0 +1,12 @@
+{
+    "bulkdata_url_month": "https://ted.europa.eu/packages/monthly/2024-04",
+    "bulkdata_url": "https://ted.europa.eu/packages/daily/202400086",
+    "data_directory": "data/",
+    "download_subdir": "/Users/frederic/Downloads/data",
+    "xml_subdir": "xml/",
+    "xml_error_subdir": "xml_error/",
+    "json_subdir": "json/",
+    "json_subdir_error": "json_error/",
+    "extracted_data": "output/",
+    "extracted_file": "ted_data.csv"
+}
