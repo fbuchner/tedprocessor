@@ -3,41 +3,44 @@ package download
 import (
 	"archive/tar"
 	"compress/gzip"
+	"errors"
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 )
 
-// DownloadFile downloads a file from the given URL and saves it to the specified file path.
-func DownloadFile(url, filepath string) error {
-	resp, err := http.Get(url)
-	if err != nil {
-		return fmt.Errorf("failed to download file: %v", err)
+func CreateDownloadLinks(downloadUrl string, startYear, startMonth, endYear, endMonth int) ([]string, error) {
+	// Validate months
+	if startMonth < 1 || startMonth > 12 {
+		return nil, errors.New("start month must be between 1 and 12")
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to download file: status code %d", resp.StatusCode)
+	if endMonth < 1 || endMonth > 12 {
+		return nil, errors.New("end month must be between 1 and 12")
 	}
 
-	out, err := os.Create(filepath)
-	if err != nil {
-		return fmt.Errorf("failed to create file: %v", err)
-	}
-	defer out.Close()
+	// Create time instances for the start and end dates
+	startDate := time.Date(startYear, time.Month(startMonth), 1, 0, 0, 0, 0, time.UTC)
+	endDate := time.Date(endYear, time.Month(endMonth), 1, 0, 0, 0, 0, time.UTC)
 
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		return fmt.Errorf("failed to write file: %v", err)
+	// Validate date range
+	if startDate.After(endDate) {
+		return nil, errors.New("start date cannot be after end date")
 	}
 
-	if err := out.Sync(); err != nil {
-		return fmt.Errorf("failed to sync file: %v", err)
+	var urls []string
+
+	// Iterate over each month between the start date and the end date
+	for date := startDate; !date.After(endDate); date = date.AddDate(0, 1, 0) {
+		// Format the URL
+		formattedDate := fmt.Sprintf("%d-%02d", date.Year(), date.Month())
+		url := fmt.Sprintf("%s/%s", downloadUrl, formattedDate)
+		// Append the URL to the slice
+		urls = append(urls, url)
 	}
 
-	return nil
+	return urls, nil
 }
 
 // ExtractTarGz extracts a .tar.gz file to the specified directory.

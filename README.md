@@ -24,7 +24,7 @@ The procurement procedure object describes an ongoing procurement procedure, i.e
 | Procedure.Country |  |  |  |
 | Procedure.Title |  |  |  |
 | Procedure.Description |  |  |  |
-| Procedure.Type |  |  |  |
+| Procjedure.Type |  |  |  |
 | Procedure.ContractType |  |  |  |
 | Procedure.ProcuringEntity |  |  |  |
 | Procedure.CPV |  |  |  |

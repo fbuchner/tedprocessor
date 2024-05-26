@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	"tedprocessor/config"
-	"tedprocessor/download"
+	"tedprocessor/convert"
 )
 
 func main() {
@@ -17,16 +17,29 @@ func main() {
 		return
 	}
 
+	// Step 1: Download data
 	// Ensure the destination directory exists
 	if err := os.MkdirAll(cfg.DownloadSubdir, 0755); err != nil {
 		fmt.Printf("Failed to create destination directory: %v", err)
 	}
-
-	// Step 1: Download data
-	err = download.DownloadAndExtract(cfg.BulkddataUrl, cfg.DownloadSubdir)
+	//err = download.DownloadAndExtract(cfg.BulkddataUrl, cfg.DownloadSubdir)
 	if err != nil {
 		fmt.Printf("Error downloading data: %v\n", err)
 		return
 	}
 	fmt.Println("Data downloaded successfully.")
+
+	// Step 2: Convert to JSON
+	err = convert.ReadXML()
+	if err != nil {
+		fmt.Printf("Error reading xml data: %v\n", err)
+		return
+	}
+
+	//err = testing.ReadXML()
+	if err != nil {
+		fmt.Printf("Error reading xml data: %v\n", err)
+		return
+	}
+
 }
