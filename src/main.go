@@ -5,6 +5,8 @@ import (
 	"os"
 	"tedprocessor/config"
 	"tedprocessor/convert"
+	"tedprocessor/download"
+	"tedprocessor/transform"
 )
 
 func main() {
@@ -19,27 +21,48 @@ func main() {
 
 	// Step 1: Download data
 	// Ensure the destination directory exists
-	if err := os.MkdirAll(cfg.DownloadSubdir, 0755); err != nil {
-		fmt.Printf("Failed to create destination directory: %v", err)
+	if cfg.RunStepDownload {
+		err = os.MkdirAll(cfg.DownloadDir, 0755)
+		if err != nil {
+			fmt.Printf("Failed to create destination directory: %v", err)
+			return
+		}
+
+		links, err := download.CreateDownloadLinks(cfg.BulkddataUrl, 0, 0, 0, 0)
+		if err != nil {
+			fmt.Printf("Error creating download links: %v\n", err)
+			return
+		}
+
+		for _, link := range links {
+			err = download.DownloadAndExtract(link, cfg.DownloadDir)
+			if err != nil {
+				fmt.Printf("Error downloading data: %v\n", err)
+				return
+			}
+		}
+
+		fmt.Println("Data downloaded successfully.")
 	}
-	//err = download.DownloadAndExtract(cfg.BulkddataUrl, cfg.DownloadSubdir)
-	if err != nil {
-		fmt.Printf("Error downloading data: %v\n", err)
-		return
-	}
-	fmt.Println("Data downloaded successfully.")
 
 	// Step 2: Convert to JSON
-	err = convert.ReadXML(cfg.CountryFilter)
-	if err != nil {
-		fmt.Printf("Error reading xml data: %v\n", err)
-		return
+	// TODO itereate over all XML files
+	if cfg.RunStepProcessXML {
+		err = convert.ProcessXML("", cfg.DownloadDir, cfg.CountryFilter)
+		if err != nil {
+			fmt.Printf("Error reading xml data: %v\n", err)
+			return
+		}
 	}
 
-	//err = testing.ReadXML()
-	if err != nil {
-		fmt.Printf("Error reading xml data: %v\n", err)
-		return
+	// Step 3: Build target data model and save
+	if cfg.RunStepTransform {
+		err = transform.ProcessData()
+		if err != nil {
+			fmt.Printf("Error processing json data to target model: %v\n", err)
+			return
+		}
 	}
 
+	fmt.Printf("Processing finished.")
 }

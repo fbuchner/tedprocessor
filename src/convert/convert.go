@@ -6,18 +6,20 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 // Structs to represent XML elements, ContractNotice being the encompassing root element
 type ContractNotice struct {
-	IssueDate             string                `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 IssueDate"`
-	NoticeTypeCode        string                `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 NoticeTypeCode"`
-	NoticeLanguageCode    string                `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 NoticeLanguageCode"`
-	UBLExtensions         UBLExtensions         `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2 UBLExtensions"`
-	ContractingParty      ContractingParty      `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2 ContractingParty"`
-	TenderingProcess      TenderingProcess      `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2 TenderingProcess"`
-	ProcurementProject    ProcurementProject    `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2 ProcurementProject"`
-	ProcurementProjectLot ProcurementProjectLot `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2 ProcurementProjectLot"`
+	IssueDate             string                  `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 IssueDate"`
+	NoticeTypeCode        string                  `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 NoticeTypeCode"`
+	NoticeLanguageCode    string                  `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 NoticeLanguageCode"`
+	UBLExtensions         UBLExtensions           `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2 UBLExtensions"`
+	ContractingParty      ContractingParty        `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2 ContractingParty"`
+	TenderingProcess      TenderingProcess        `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2 TenderingProcess"`
+	ProcurementProject    ProcurementProject      `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2 ProcurementProject"`
+	ProcurementProjectLot []ProcurementProjectLot `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2 ProcurementProjectLot"`
 }
 
 type UBLExtensions struct {
@@ -128,6 +130,7 @@ type ProcurementProject struct {
 	Note                        string                      `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 Note"`
 	MainCommodityClassification MainCommodityClassification `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2 MainCommodityClassification"`
 	RealizedLocation            RealizedLocation            `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2 RealizedLocation"`
+	PlannedPeriod               PlannedPeriod               `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2 PlannedPeriod"`
 }
 
 type MainCommodityClassification struct {
@@ -146,13 +149,23 @@ type Address struct {
 	Country              Country `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2 Country"`
 }
 
-type ProcurementProjectLot struct {
-	ID string `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 ID"`
+type PlannedPeriod struct {
+	DurationMeasure DurationMeasure `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 DurationMeasure"`
 }
 
-func ReadXML(countryFilter string) error {
+type DurationMeasure struct {
+	Value    string `xml:",chardata"`
+	UnitCode string `xml:"unitCode,attr"`
+}
+
+type ProcurementProjectLot struct {
+	ID                 string             `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 ID"`
+	ProcurementProject ProcurementProject `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2 ProcurementProject"`
+}
+
+func ProcessXML(xmlFilepath string, jsonFolderpath string, countryFilter string) error {
 	// Open the XML file
-	xmlFile, err := os.Open("/Users/frederic/Downloads/00262102_2024.xml")
+	xmlFile, err := os.Open(xmlFilepath)
 	if err != nil {
 		return fmt.Errorf("failed to read xml file: %v", err)
 	}
@@ -171,12 +184,18 @@ func ReadXML(countryFilter string) error {
 	//fmt.Printf("%+v\n", contractNotice)
 
 	// Skip processing if the country filter does not match the realized location country
-	if contractNotice.ProcurementProject.RealizedLocation.Address.Country.IdentificationCode != countryFilter {
+	if countryFilter != "" && (contractNotice.ProcurementProject.RealizedLocation.Address.Country.IdentificationCode != countryFilter ||
+		contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.Country.IdentificationCode == "DEU") {
 		return nil
 	}
 
+	//set filename for JSON file
+	filenameWithExt := filepath.Base(xmlFilepath)
+	ext := filepath.Ext(filenameWithExt)
+	filenameWithoutExt := strings.TrimSuffix(filenameWithExt, ext)
+	targetPath := jsonFolderpath + "/" + filenameWithoutExt + ".json"
 	//write data out to JSON
-	writeJSON(contractNotice, "/Users/frederic/Downloads/contractnotice.json")
+	writeJSON(contractNotice, targetPath)
 
 	return nil
 }

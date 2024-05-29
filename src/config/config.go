@@ -6,16 +6,19 @@ import (
 )
 
 type Config struct {
-	BulkddataUrl        string `json:"bulkdata_url"`
-	DataDirectory       string `json:"data_directory"`
-	DownloadSubdir      string `json:"download_subdir"`
-	XMLSubdir           string `json:"xml_subdir"`
-	XMLErrorSubdir      string `json:"xml_error_subdir"`
-	JSONSubdir          string `json:"json_subdir"`
-	JSONErrorSubdir     string `json:"json_subdir_error"`
-	ExtractedDataSubdir string `json:"extracted_data_subdir"`
-	ExtractedFile       string `json:"extracted_file"`
-	CountryFilter       string `json:"filter_for_country"`
+	BulkddataUrl          string `json:"bulkdata_url"`
+	DownloadDir           string `json:"download_dir"`
+	XMLDir                string `json:"xml_dir"`
+	XMLErrorDir           string `json:"xml_error_dir"`
+	JSONDir               string `json:"json_dir"`
+	JSONErrorDir          string `json:"json_dir_error"`
+	ExtractedDataDir      string `json:"extracted_data_dir"`
+	ExtractedFile         string `json:"extracted_file"`
+	CountryFilter         string `json:"filter_for_country"`
+	RunStepDownload       bool   `json:"run_step_download"`
+	RunStepProcessXML     bool   `json:"run_step_processxml"`
+	RunStepTransform      bool   `json:"run_step_transform"`
+	DeleteAfterProcessing bool   `json:"delete_after_processing"`
 }
 
 func LoadConfig(filepath string) (*Config, error) {

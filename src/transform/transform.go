@@ -2,6 +2,7 @@ package transform
 
 import "fmt"
 
-func Greet() {
+func ProcessData() error {
 	fmt.Println("Greetings from package2")
+	return nil
 }
