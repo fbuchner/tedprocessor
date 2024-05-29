@@ -8,5 +8,6 @@
     "json_subdir": "json/",
     "json_subdir_error": "json_error/",
     "extracted_data": "output/",
-    "extracted_file": "ted_data.csv"
+    "extracted_file": "ted_data.csv",
+    "filter_for_country": "DEU"
 }

@@ -150,7 +150,7 @@ type ProcurementProjectLot struct {
 	ID string `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 ID"`
 }
 
-func ReadXML() error {
+func ReadXML(countryFilter string) error {
 	// Open the XML file
 	xmlFile, err := os.Open("/Users/frederic/Downloads/00262102_2024.xml")
 	if err != nil {
@@ -169,6 +169,11 @@ func ReadXML() error {
 
 	// Print the struct (for debugging purposes)
 	//fmt.Printf("%+v\n", contractNotice)
+
+	// Skip processing if the country filter does not match the realized location country
+	if contractNotice.ProcurementProject.RealizedLocation.Address.Country.IdentificationCode != countryFilter {
+		return nil
+	}
 
 	//write data out to JSON
 	writeJSON(contractNotice, "/Users/frederic/Downloads/contractnotice.json")

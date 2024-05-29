@@ -30,7 +30,7 @@ func main() {
 	fmt.Println("Data downloaded successfully.")
 
 	// Step 2: Convert to JSON
-	err = convert.ReadXML()
+	err = convert.ReadXML(cfg.CountryFilter)
 	if err != nil {
 		fmt.Printf("Error reading xml data: %v\n", err)
 		return

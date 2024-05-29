@@ -15,6 +15,7 @@ type Config struct {
 	JSONErrorSubdir     string `json:"json_subdir_error"`
 	ExtractedDataSubdir string `json:"extracted_data_subdir"`
 	ExtractedFile       string `json:"extracted_file"`
+	CountryFilter       string `json:"filter_for_country"`
 }
 
 func LoadConfig(filepath string) (*Config, error) {
