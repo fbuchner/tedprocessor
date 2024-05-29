@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"time"
@@ -41,6 +42,36 @@ func CreateDownloadLinks(downloadUrl string, startYear, startMonth, endYear, end
 	}
 
 	return urls, nil
+}
+
+// DownloadFile downloads a file from the given URL and saves it to the specified file path.
+func DownloadFile(url, filepath string) error {
+	resp, err := http.Get(url)
+	if err != nil {
+		return fmt.Errorf("failed to download file: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to download file: status code %d", resp.StatusCode)
+	}
+
+	out, err := os.Create(filepath)
+	if err != nil {
+		return fmt.Errorf("failed to create file: %v", err)
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to write file: %v", err)
+	}
+
+	if err := out.Sync(); err != nil {
+		return fmt.Errorf("failed to sync file: %v", err)
+	}
+
+	return nil
 }
 
 // ExtractTarGz extracts a .tar.gz file to the specified directory.
