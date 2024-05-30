@@ -19,6 +19,7 @@ type Config struct {
 	RunStepProcessXML     bool   `json:"run_step_processxml"`
 	RunStepTransform      bool   `json:"run_step_transform"`
 	DeleteAfterProcessing bool   `json:"delete_after_processing"`
+	LogLevel              string `json:"log_level"`
 }
 
 func LoadConfig(filepath string) (*Config, error) {

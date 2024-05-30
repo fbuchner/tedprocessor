@@ -12,5 +12,6 @@
     "run_step_download": true,
     "run_step_processxml": true,
     "run_step_transform": true,
-    "delete_after_processing": false
+    "delete_after_processing": false,
+    "loglevel_debug": true
 }
