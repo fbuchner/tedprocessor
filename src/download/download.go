@@ -9,7 +9,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 func CreateDownloadLinks(downloadUrl string, startYear, startMonth, endYear, endMonth int) ([]string, error) {
@@ -46,6 +49,8 @@ func CreateDownloadLinks(downloadUrl string, startYear, startMonth, endYear, end
 
 // DownloadFile downloads a file from the given URL and saves it to the specified file path.
 func DownloadFile(url, filepath string) error {
+	log.Debug().Str("URL", url).Str("filepath", filepath).Msg("Download file")
+
 	resp, err := http.Get(url)
 	if err != nil {
 		return fmt.Errorf("failed to download file: %v", err)
@@ -75,7 +80,9 @@ func DownloadFile(url, filepath string) error {
 }
 
 // ExtractTarGz extracts a .tar.gz file to the specified directory.
-func ExtractTarGz(gzipPath, destDir string) error {
+func ExtractTarGz(gzipPath, downloadDir, XMLDir string) error {
+	log.Debug().Str("Archive file", gzipPath).Str("Destination directory", downloadDir).Msg("Extracting archive")
+
 	file, err := os.Open(gzipPath)
 	if err != nil {
 		return fmt.Errorf("failed to open gzip file: %v", err)
@@ -99,7 +106,7 @@ func ExtractTarGz(gzipPath, destDir string) error {
 			return fmt.Errorf("error reading tar file: %v", err)
 		}
 
-		filePath := filepath.Join(destDir, header.Name)
+		filePath := filepath.Join(downloadDir, header.Name)
 
 		switch header.Typeflag {
 		case tar.TypeDir:
@@ -126,6 +133,14 @@ func ExtractTarGz(gzipPath, destDir string) error {
 			if err := os.Chmod(filePath, os.FileMode(header.Mode)); err != nil {
 				return fmt.Errorf("failed to set file permissions: %v", err)
 			}
+
+			// Check if the extracted file is another .tar.gz file and extract it recursively
+			// First extraction happens from temp directory into download directory, now we extract to XML directory
+			if strings.HasSuffix(filePath, ".tar.gz") {
+				if err := ExtractTarGz(filePath, XMLDir, XMLDir); err != nil {
+					return err
+				}
+			}
 		default:
 			return fmt.Errorf("unsupported file type: %v", header.Typeflag)
 		}
@@ -135,7 +150,7 @@ func ExtractTarGz(gzipPath, destDir string) error {
 }
 
 // DownloadAndExtract downloads a .tar.gz file from the given URL, saves it to disk, and extracts it to the specified directory.
-func DownloadAndExtract(url, destDir string) error {
+func DownloadAndExtract(url, downloadDir, xmlDir string) error {
 	tmpFile, err := os.CreateTemp("", "download-*.tar.gz")
 	if err != nil {
 		return fmt.Errorf("failed to create temporary file: %v", err)
@@ -146,7 +161,7 @@ func DownloadAndExtract(url, destDir string) error {
 		return err
 	}
 
-	if err := ExtractTarGz(tmpFile.Name(), destDir); err != nil {
+	if err := ExtractTarGz(tmpFile.Name(), downloadDir, xmlDir); err != nil {
 		return err
 	}
 
