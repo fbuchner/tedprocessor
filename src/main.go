@@ -28,7 +28,7 @@ func main() {
 
 	// Step 1: Download data
 	// Ensure the destination directory exists
-	if cfg.RunStepDownload {
+	if cfg.RunSteps.RunStepDownload {
 		log.Debug().Msg("Starting Download process")
 
 		err = os.MkdirAll(cfg.DownloadDir, 0755)
@@ -36,16 +36,23 @@ func main() {
 			log.Error().Err(err).Msg("Failed to create destination directory")
 			return
 		}
-		log.Debug().Str("directory", cfg.DownloadDir).Msg("Download directory exists")
+		err = os.MkdirAll(cfg.XMLDir, 0755)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to create destination directory")
+			return
+		}
+		log.Debug().Str("Download directory", cfg.DownloadDir).Str("XML directory", cfg.XMLDir).Msg("Download directories exists")
 
-		links, err := download.CreateDownloadLinks(cfg.BulkddataUrl, 0, 0, 0, 0)
+		links, err := download.CreateDownloadLinks(cfg.BulkddataUrl, cfg.DownloadPeriod.FromYear, cfg.DownloadPeriod.FromMonth, cfg.DownloadPeriod.ToYear, cfg.DownloadPeriod.ToMonth)
 		if err != nil {
 			log.Error().Err(err).Msg("Error creating download links")
 			return
 		}
+		log.Debug().Interface("Download links", links).Msg("Found download links")
 
 		for _, link := range links {
-			err = download.DownloadAndExtract(link, cfg.DownloadDir)
+			log.Debug().Str("URL", link).Msg("Downloading from link")
+			err = download.DownloadAndExtract(link, cfg.DownloadDir, cfg.XMLDir)
 			if err != nil {
 				log.Error().Err(err).Msg("Error downloading data")
 				return
@@ -57,7 +64,7 @@ func main() {
 
 	// Step 2: Convert to JSON
 	// TODO itereate over all XML files
-	if cfg.RunStepProcessXML {
+	if cfg.RunSteps.RunStepProcessXML {
 		err = convert.ProcessXML("", cfg.DownloadDir, cfg.CountryFilter)
 		if err != nil {
 			log.Error().Err(err).Msg("Error reading xml data")
@@ -66,7 +73,7 @@ func main() {
 	}
 
 	// Step 3: Build target data model and save
-	if cfg.RunStepTransform {
+	if cfg.RunSteps.RunStepTransform {
 		err = transform.ProcessData()
 		if err != nil {
 			log.Error().Err(err).Msg("Error processing json data to target data model")

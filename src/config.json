@@ -1,17 +1,23 @@
 {
-    "bulkdata_url_month": "https://ted.europa.eu/packages/monthly/2024-04",
-    "bulkdata_url": "https://ted.europa.eu/packages/daily/202400086",
+    "bulkdata_url": "https://ted.europa.eu/packages/monthly",
     "download_dir": "/Users/frederic/Downloads/data/download",
     "xml_dir": "/Users/frederic/Downloads/data/xml",
-    "xml_error_dir": "xml_error/",
     "json_dir": "/Users/frederic/Downloads/download/data/json",
     "json_dir_error": "json_error/",
     "extracted_data": "output/",
     "extracted_file": "ted_data.csv",
     "filter_for_country": "DEU",
-    "run_step_download": true,
-    "run_step_processxml": true,
-    "run_step_transform": true,
+    "run_steps": {
+        "run_step_download": false,
+        "run_step_processxml": true,
+        "run_step_transform": false
+    },
     "delete_after_processing": false,
-    "loglevel_debug": true
+    "download_period": {
+        "from_year": 2024,
+        "from_month": 1,
+        "to_year": 2024,
+        "to_month": 1
+    },
+    "log_level": "debug"
 }
