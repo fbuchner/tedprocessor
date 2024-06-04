@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"tedprocessor/config"
 	"tedprocessor/convert"
@@ -27,21 +28,19 @@ func main() {
 	log.Info().Msg("Starting ETL process.")
 
 	// Step 1: Download data
-	// Ensure the destination directory exists
 	if cfg.RunSteps.RunStepDownload {
 		log.Debug().Msg("Starting Download process")
 
-		err = os.MkdirAll(cfg.DownloadDir, 0755)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to create destination directory")
-			return
+		// Ensure the destination directory exists
+		dirs := []string{cfg.DownloadDir, cfg.XMLDir, cfg.JSONDir}
+		for _, dir := range dirs {
+			err := os.MkdirAll(dir, 0755)
+			if err != nil {
+				log.Error().Err(err).Msgf("Failed to create destination directory: %s", dir)
+				return
+			}
+			log.Debug().Str("directory", dir).Msg("Directory exists (either already or created)")
 		}
-		err = os.MkdirAll(cfg.XMLDir, 0755)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to create destination directory")
-			return
-		}
-		log.Debug().Str("Download directory", cfg.DownloadDir).Str("XML directory", cfg.XMLDir).Msg("Download directories exists")
 
 		links, err := download.CreateDownloadLinks(cfg.BulkddataUrl, cfg.DownloadPeriod.FromYear, cfg.DownloadPeriod.FromMonth, cfg.DownloadPeriod.ToYear, cfg.DownloadPeriod.ToMonth)
 		if err != nil {
@@ -63,9 +62,21 @@ func main() {
 	}
 
 	// Step 2: Convert to JSON
-	// TODO itereate over all XML files
 	if cfg.RunSteps.RunStepProcessXML {
-		err = convert.ProcessXML("", cfg.DownloadDir, cfg.CountryFilter)
+
+		err = filepath.Walk(cfg.XMLDir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if !info.IsDir() && strings.HasSuffix(strings.ToLower(info.Name()), ".xml") {
+				err = convert.ProcessXML(path, cfg.JSONDir, cfg.CountryFilter)
+				if err != nil {
+					return err
+				}
+			}
+			return nil
+		})
+
 		if err != nil {
 			log.Error().Err(err).Msg("Error reading xml data")
 			return
@@ -84,7 +95,7 @@ func main() {
 	log.Info().Msg("Processing finished. Exiting.")
 }
 
-// maps a string log level to a zerolog log level
+// Maps a string log level to a zerolog log level
 func mapLogLevel(level string) zerolog.Level {
 	switch strings.ToLower(level) {
 	case "debug":

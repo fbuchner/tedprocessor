@@ -2,7 +2,7 @@
     "bulkdata_url": "https://ted.europa.eu/packages/monthly",
     "download_dir": "/Users/frederic/Downloads/data/download",
     "xml_dir": "/Users/frederic/Downloads/data/xml",
-    "json_dir": "/Users/frederic/Downloads/download/data/json",
+    "json_dir": "/Users/frederic/Downloads/data/json",
     "json_dir_error": "json_error/",
     "extracted_data": "output/",
     "extracted_file": "ted_data.csv",
