@@ -31,6 +31,11 @@ func ProcessXML(xmlFilepath string, jsonFolderpath string, countryFilter string)
 		return fmt.Errorf("failed to extract xml data: %v", err)
 	}
 
+	// Make sure the ContractNotice XML format was valid, there are some exotic format  mixed into TED
+	if contractNotice.NoticeID == "" {
+		log.Warn().Str("XML file", xmlFilepath).Msg("Mismatch in XML schema, skipping file")
+	}
+
 	// Print the struct (for debugging purposes)
 	//fmt.Printf("%+v\n", contractNotice)
 
