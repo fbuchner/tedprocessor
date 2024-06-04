@@ -54,7 +54,7 @@ func ProcessXML(xmlFilepath string, jsonFolderpath string, countryFilter string)
 	filenameWithExt := filepath.Base(xmlFilepath)
 	ext := filepath.Ext(filenameWithExt)
 	filenameWithoutExt := strings.TrimSuffix(filenameWithExt, ext)
-	targetPath := jsonFolderpath + "/" + filenameWithoutExt + ".json"
+	targetPath := filepath.Join(jsonFolderpath, filenameWithoutExt+".json")
 	//write data out to JSON
 	writeJSON(contractNotice, targetPath)
 	log.Debug().Str("JSON path", targetPath).Msg("Writing JSON file")
