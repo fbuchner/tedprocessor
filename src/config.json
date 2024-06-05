@@ -5,12 +5,12 @@
     "json_dir": "/Users/frederic/Downloads/data/json",
     "json_dir_error": "json_error/",
     "extracted_data": "output/",
-    "extracted_file": "ted_data.csv",
+    "extracted_file": "/Users/frederic/Downloads/data/ted_data.csv",
     "filter_for_country": "DEU",
     "run_steps": {
         "run_step_download": false,
-        "run_step_processxml": true,
-        "run_step_transform": false
+        "run_step_processxml": false,
+        "run_step_transform": true
     },
     "delete_after_processing": false,
     "download_period": {
