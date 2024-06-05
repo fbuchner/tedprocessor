@@ -32,6 +32,7 @@ func ProcessJSON(jsonFilepath, targetFilepath string) error {
 	dataRow.NoticePublicationID = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Publication.NoticePublicationID
 	dataRow.ContractingActivityTypeCode = contractNotice.ContractingParty.ContractingActivity.ActivityTypeCode
 
+	//TODO check if array empty in UBLExtensions
 	dataRow.MainOrgGroupLeadIndicator = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].GroupLeadIndicator
 	dataRow.MainOrgAcquiringCPBIndicator = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].AcquiringCPBIndicator
 	dataRow.MainOrgAwardingCPBIndicator = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].AwardingCPBIndicator
