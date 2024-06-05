@@ -31,7 +31,7 @@ func ProcessXML(xmlFilepath string, jsonFolderpath string, countryFilter string)
 		return fmt.Errorf("failed to extract xml data: %v", err)
 	}
 
-	// Make sure the ContractNotice XML format was valid, there are some exotic format  mixed into TED
+	// Make sure the ContractNotice XML format is valid, there are some exotic formats mixed into TED
 	if contractNotice.NoticeID == "" {
 		log.Warn().Str("XML file", xmlFilepath).Msg("Mismatch in XML schema, skipping file")
 	}
@@ -50,12 +50,12 @@ func ProcessXML(xmlFilepath string, jsonFolderpath string, countryFilter string)
 		return nil
 	}
 
-	//set filename for JSON file
+	// Set filename for JSON file
 	filenameWithExt := filepath.Base(xmlFilepath)
 	ext := filepath.Ext(filenameWithExt)
 	filenameWithoutExt := strings.TrimSuffix(filenameWithExt, ext)
 	targetPath := filepath.Join(jsonFolderpath, filenameWithoutExt+".json")
-	//write data out to JSON
+	// Write data out to JSON
 	writeJSON(contractNotice, targetPath)
 	log.Debug().Str("JSON path", targetPath).Msg("Writing JSON file")
 

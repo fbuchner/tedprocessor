@@ -22,25 +22,27 @@ func main() {
 		return
 	}
 
+	//Set log level according to configuration, defaults to info (see function below)
 	zerolog.SetGlobalLevel(mapLogLevel(cfg.LogLevel))
+
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	log.Info().Msg("Starting ETL process.")
 
+	// Ensure the destination directory exists
+	dirs := []string{cfg.DownloadDir, cfg.XMLDir, cfg.JSONDir}
+	for _, dir := range dirs {
+		err := os.MkdirAll(dir, 0755)
+		if err != nil {
+			log.Error().Err(err).Msgf("Failed to create destination directory: %s", dir)
+			return
+		}
+		log.Debug().Str("directory", dir).Msg("Directory exists (either already or created)")
+	}
+
 	// Step 1: Download data
 	if cfg.RunSteps.RunStepDownload {
 		log.Debug().Msg("Starting Download process")
-
-		// Ensure the destination directory exists
-		dirs := []string{cfg.DownloadDir, cfg.XMLDir, cfg.JSONDir}
-		for _, dir := range dirs {
-			err := os.MkdirAll(dir, 0755)
-			if err != nil {
-				log.Error().Err(err).Msgf("Failed to create destination directory: %s", dir)
-				return
-			}
-			log.Debug().Str("directory", dir).Msg("Directory exists (either already or created)")
-		}
 
 		links, err := download.CreateDownloadLinks(cfg.BulkddataUrl, cfg.DownloadPeriod.FromYear, cfg.DownloadPeriod.FromMonth, cfg.DownloadPeriod.ToYear, cfg.DownloadPeriod.ToMonth)
 		if err != nil {
@@ -85,9 +87,22 @@ func main() {
 
 	// Step 3: Build target data model and save
 	if cfg.RunSteps.RunStepTransform {
-		err = transform.ProcessData()
+
+		err = filepath.Walk(cfg.JSONDir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if !info.IsDir() && strings.HasSuffix(strings.ToLower(info.Name()), ".json") {
+				err = transform.ProcessJSON(path, cfg.ExtractedFile)
+				if err != nil {
+					return err
+				}
+			}
+			return nil
+		})
+
 		if err != nil {
-			log.Error().Err(err).Msg("Error processing json data to target data model")
+			log.Error().Err(err).Msg("Error processing JSON data")
 			return
 		}
 	}
