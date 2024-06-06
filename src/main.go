@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -15,8 +16,13 @@ import (
 )
 
 func main() {
+	// The path to the configuration file can be given as a parameter ("go run main.go -config=/path/to/your/config.json")
+	var configPath string
+	flag.StringVar(&configPath, "config", "config.json", "path to the config file")
+	flag.Parse()
+
 	// Load configuration
-	cfg, err := config.LoadConfig("config.json")
+	cfg, err := config.LoadConfig(configPath)
 	if err != nil {
 		fmt.Printf("Error loading config: %v\n", err)
 		return
