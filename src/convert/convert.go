@@ -42,7 +42,7 @@ func ProcessXML(xmlFilepath string, jsonFolderpath string, countryFilter string)
 	// Skip processing if the country filter does not match the realized location country
 	countryCode1 := contractNotice.ProcurementProject.RealizedLocation.Address.Country.IdentificationCode
 	countryCode2 := ""
-	if len(contractNotice.UBLExtensions.UBLExtension) > 0 {
+	if len(contractNotice.UBLExtensions.UBLExtension) > 0 && len(contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization) > 0 {
 		countryCode2 = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.Country.IdentificationCode
 	}
 	if countryFilter != "" && countryCode1 != countryFilter && countryCode2 != countryFilter {

@@ -18,6 +18,7 @@ type Config struct {
 	DeleteAfterProcessing bool           `json:"delete_after_processing"`
 	DownloadPeriod        DownloadPeriod `json:"download_period"`
 	LogLevel              string         `json:"log_level"`
+	CSVSeparator          string         `json:"csv_separator_char"`
 }
 
 type RunSteps struct {

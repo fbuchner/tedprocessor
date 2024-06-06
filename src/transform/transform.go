@@ -13,7 +13,7 @@ import (
 )
 
 // Processes a JSON file, appends result to target file
-func ProcessJSON(jsonFilepath, targetFilepath string) error {
+func ProcessJSON(jsonFilepath, targetFilepath string, csvSeparator string) error {
 	log.Debug().Str("JSON file", jsonFilepath).Msg("Processing JSON file")
 
 	contractNotice, err := ReadJSON(jsonFilepath)
@@ -52,12 +52,40 @@ func ProcessJSON(jsonFilepath, targetFilepath string) error {
 
 	dataRow.TenderingProcessProcedureCode = contractNotice.TenderingProcess.ProcedureCode
 
-	// Now flatten the lot structure by creating several copies of the structure if necessary
-	// TODO iterate
+	// Set default procurement project data
+	dataRow.ProcurementProjectID = contractNotice.ProcurementProject.ID
+	dataRow.ProcurementProjectName = contractNotice.ProcurementProject.Name
+	dataRow.ProcurementProjectDescription = contractNotice.ProcurementProject.Description
+	dataRow.ProcurementProjectProcurementTypeCode = contractNotice.ProcurementProject.ProcurementTypeCode
+	dataRow.ProcurementProjectNote = contractNotice.ProcurementProject.Note
+	dataRow.ProcurementProjectMainCommodityClassification = contractNotice.ProcurementProject.MainCommodityClassification.ItemClassificationCode
 
-	err = appendStructToCSV(targetFilepath, dataRow)
-	if err != nil {
-		return fmt.Errorf("failed to append data row: %v", err)
+	// Now flatten the lot structure by creating several copies of the structure if necessary
+	for _, lot := range contractNotice.ProcurementProjectLot {
+		dataRow.LotID = lot.ID
+		dataRow.LotName = lot.ProcurementProject.Name
+		dataRow.LotDescription = lot.ProcurementProject.Description
+		dataRow.LotProcurementTypeCode = lot.ProcurementProject.ProcurementTypeCode
+		dataRow.LotProjectNote = lot.ProcurementProject.Note
+		dataRow.LotMainCommodityClassification = lot.ProcurementProject.MainCommodityClassification.ItemClassificationCode
+
+		// TODO there is also a RealizedLocation based on the Main Procurement Project. One could compare the info and take the Main Procurement one as default and overwrite with lot info as long as that is not empty
+		dataRow.RealizedLocationAddressStreetName = lot.ProcurementProject.RealizedLocation.Address.StreetName
+		dataRow.RealizedLocationAddressCityName = lot.ProcurementProject.RealizedLocation.Address.CityName
+		dataRow.RealizedLocationAddressPostalZone = lot.ProcurementProject.RealizedLocation.Address.PostalZone
+		dataRow.RealizedLocationAddressCountrySubentityCode = lot.ProcurementProject.RealizedLocation.Address.CountrySubentityCode
+		dataRow.RealizedLocationAddressCountryIdentificationCode = lot.ProcurementProject.RealizedLocation.Address.Country.IdentificationCode
+
+		// Use conditional assignment to not assign only a space as value if empty
+		if lot.ProcurementProject.PlannedPeriod.DurationMeasure.Value != "" {
+			dataRow.DurationMeasure = lot.ProcurementProject.PlannedPeriod.DurationMeasure.Value + " " + lot.ProcurementProject.PlannedPeriod.DurationMeasure.UnitCode
+		}
+
+		// Add the dataRow item as a line in the CSV file
+		err = appendStructToCSV(targetFilepath, dataRow, csvSeparator)
+		if err != nil {
+			return fmt.Errorf("failed to append data row: %v", err)
+		}
 	}
 
 	return nil
@@ -85,7 +113,12 @@ func ReadJSON(filePath string) (convert.ContractNotice, error) {
 }
 
 // Generic CSV writer that appends a struct to a CSV file
-func appendStructToCSV(filePath string, data interface{}) error {
+func appendStructToCSV(filePath string, data interface{}, csvSeparator string) error {
+	if len(csvSeparator) == 0 {
+		csvSeparator = ";"
+	}
+	var csvSeparatorRune rune = rune(csvSeparator[0])
+
 	var writeHeaders bool
 
 	// Check if file exists
@@ -102,6 +135,7 @@ func appendStructToCSV(filePath string, data interface{}) error {
 
 	// Create a CSV writer
 	writer := csv.NewWriter(file)
+	writer.Comma = csvSeparatorRune
 	defer writer.Flush()
 
 	// Use reflection to get the struct's field names and values

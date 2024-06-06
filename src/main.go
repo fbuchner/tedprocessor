@@ -93,7 +93,7 @@ func main() {
 				return err
 			}
 			if !info.IsDir() && strings.HasSuffix(strings.ToLower(info.Name()), ".json") {
-				err = transform.ProcessJSON(path, cfg.ExtractedFile)
+				err = transform.ProcessJSON(path, cfg.ExtractedFile, cfg.CSVSeparator)
 				if err != nil {
 					return err
 				}

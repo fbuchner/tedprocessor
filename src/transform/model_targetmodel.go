@@ -29,14 +29,19 @@ type DataRow struct {
 
 	TenderingProcessProcedureCode string
 
-	LotID string
-
 	ProcurementProjectID                          string
 	ProcurementProjectName                        string
 	ProcurementProjectDescription                 string
 	ProcurementProjectProcurementTypeCode         string
 	ProcurementProjectNote                        string
 	ProcurementProjectMainCommodityClassification string
+
+	LotID                          string
+	LotName                        string
+	LotDescription                 string
+	LotProcurementTypeCode         string
+	LotProjectNote                 string
+	LotMainCommodityClassification string
 
 	DurationMeasure string
 
