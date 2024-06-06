@@ -1,11 +1,9 @@
 {
     "bulkdata_url": "https://ted.europa.eu/packages/monthly",
-    "download_dir": "/Users/frederic/Downloads/data/download",
-    "xml_dir": "/Users/frederic/Downloads/data/xml",
-    "json_dir": "/Users/frederic/Downloads/data/json",
-    "json_dir_error": "json_error/",
-    "extracted_data": "output/",
-    "extracted_file": "/Users/frederic/Downloads/data/ted_data.csv",
+    "download_dir": "",
+    "xml_dir": "",
+    "json_dir": "",
+    "extracted_file": "",
     "filter_for_country": "DEU",
     "run_steps": {
         "run_step_download": true,

@@ -43,7 +43,7 @@ func main() {
 			log.Error().Err(err).Msgf("Failed to create destination directory: %s", dir)
 			return
 		}
-		log.Debug().Str("directory", dir).Msg("Directory exists (either already or created)")
+		log.Debug().Str("directory", dir).Msg("Found or created directory")
 	}
 
 	// Step 1: Download data

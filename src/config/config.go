@@ -10,8 +10,6 @@ type Config struct {
 	DownloadDir           string         `json:"download_dir"`
 	XMLDir                string         `json:"xml_dir"`
 	JSONDir               string         `json:"json_dir"`
-	JSONErrorDir          string         `json:"json_dir_error"`
-	ExtractedDataDir      string         `json:"extracted_data_dir"`
 	ExtractedFile         string         `json:"extracted_file"`
 	CountryFilter         string         `json:"filter_for_country"`
 	RunSteps              RunSteps       `json:"run_steps"`
