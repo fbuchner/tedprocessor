@@ -48,7 +48,7 @@ func main() {
 
 	// Step 1: Download data
 	if cfg.RunSteps.RunStepDownload {
-		log.Debug().Msg("Starting Download process")
+		log.Info().Msg("Starting Download process.")
 
 		links, err := download.CreateDownloadLinks(cfg.BulkddataUrl, cfg.DownloadPeriod.FromYear, cfg.DownloadPeriod.FromMonth, cfg.DownloadPeriod.ToYear, cfg.DownloadPeriod.ToMonth)
 		if err != nil {
@@ -66,11 +66,12 @@ func main() {
 			}
 		}
 
-		log.Info().Msg("Data downloaded successfully")
+		log.Info().Msg("Data downloaded successfully.")
 	}
 
 	// Step 2: Convert to JSON
 	if cfg.RunSteps.RunStepProcessXML {
+		log.Info().Msg("Starting processing of XML files.")
 
 		err = filepath.Walk(cfg.XMLDir, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
@@ -89,10 +90,13 @@ func main() {
 			log.Error().Err(err).Msg("Error reading xml data")
 			return
 		}
+
+		log.Info().Msg("XML files processed successfully.")
 	}
 
 	// Step 3: Build target data model and save
 	if cfg.RunSteps.RunStepTransform {
+		log.Info().Msg("Starting transformation to target model for output.")
 
 		err = filepath.Walk(cfg.JSONDir, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
@@ -111,6 +115,8 @@ func main() {
 			log.Error().Err(err).Msg("Error processing JSON data")
 			return
 		}
+
+		log.Info().Msg("Data transformation finished successfully.")
 	}
 
 	log.Info().Msg("Processing finished. Exiting.")

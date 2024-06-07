@@ -27,8 +27,10 @@ func ProcessXML(xmlFilepath string, jsonFolderpath string, countryFilter string)
 	// Unmarshal the XML into the struct
 	var procurementProcedure ProcurementProcedure
 	err = xml.Unmarshal(byteValue, &procurementProcedure)
+
 	if err != nil {
-		return fmt.Errorf("failed to extract xml data: %v", err)
+		log.Warn().Str("XML file", xmlFilepath).Interface("Error", err).Msg("Unable to parse XML file")
+		//return fmt.Errorf("failed to extract xml data for file %s: %v", xmlFilepath, err)
 	}
 
 	// Make sure the ProcurementProcedure XML format is valid, there are some exotic formats mixed into TED
