@@ -114,6 +114,8 @@ All folders and files will be created as needed automatically by tedprocessor.
 1) open the command line (Windows + R, cmd)
 2) run tedprocessor:  `tedprocessor.exe -config=config.json`
 
+The -config parameter can be ommitted on all platforms. In this case tedprocessor looks for a "config.json" in the same directory.
+
 ### See Also
 [OP-TED](https://github.com/OP-TED) - TED and EU Github Repository of the Public Procurement Unit of the Publications Office of the European Union.
 [TED Developer Docs](https://docs.ted.europa.eu/home/index.html) - Developer portal with documentation of the eForms SDK, TED API, ontology, and other resources.

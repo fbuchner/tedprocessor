@@ -1,7 +1,7 @@
 package convert
 
-// Structs to represent XML elements, ContractNotice being the encompassing root element
-type ContractNotice struct {
+// Structs to represent XML elements, ProcurementProcedure being the encompassing root element
+type ProcurementProcedure struct {
 	NoticeID              string                  `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 ID"`
 	IssueDate             string                  `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 IssueDate"`
 	NoticeTypeCode        string                  `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 NoticeTypeCode"`

@@ -16,7 +16,7 @@ import (
 func ProcessJSON(jsonFilepath, targetFilepath string, csvSeparator string) error {
 	log.Debug().Str("JSON file", jsonFilepath).Msg("Processing JSON file")
 
-	contractNotice, err := ReadJSON(jsonFilepath)
+	procurementProcedure, err := ReadJSON(jsonFilepath)
 	if err != nil {
 		return fmt.Errorf("failed to convert json to object: %v", err)
 	}
@@ -24,44 +24,44 @@ func ProcessJSON(jsonFilepath, targetFilepath string, csvSeparator string) error
 	var dataRow DataRow
 
 	// Core attributes of the contract notice
-	dataRow.NoticeID = contractNotice.NoticeID
-	dataRow.IssueDate = contractNotice.IssueDate
-	dataRow.NoticeTypeCode = contractNotice.NoticeTypeCode
-	dataRow.NoticeLanguageCode = contractNotice.NoticeLanguageCode
-	dataRow.SubTypeCode = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.NoticeSubType.SubTypeCode
-	dataRow.NoticePublicationID = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Publication.NoticePublicationID
-	dataRow.ContractingActivityTypeCode = contractNotice.ContractingParty.ContractingActivity.ActivityTypeCode
+	dataRow.NoticeID = procurementProcedure.NoticeID
+	dataRow.IssueDate = procurementProcedure.IssueDate
+	dataRow.NoticeTypeCode = procurementProcedure.NoticeTypeCode
+	dataRow.NoticeLanguageCode = procurementProcedure.NoticeLanguageCode
+	dataRow.SubTypeCode = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.NoticeSubType.SubTypeCode
+	dataRow.NoticePublicationID = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Publication.NoticePublicationID
+	dataRow.ContractingActivityTypeCode = procurementProcedure.ContractingParty.ContractingActivity.ActivityTypeCode
 
 	//TODO check if array empty in UBLExtensions
-	dataRow.MainOrgGroupLeadIndicator = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].GroupLeadIndicator
-	dataRow.MainOrgAcquiringCPBIndicator = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].AcquiringCPBIndicator
-	dataRow.MainOrgAwardingCPBIndicator = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].AwardingCPBIndicator
-	dataRow.MainOrgWebsiteURI = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.WebsiteURI
-	dataRow.MainOrgPartyIdentificationId = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PartyIdentification.ID
-	dataRow.MainOrgPartyName = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PartyName.Name
-	dataRow.MainOrgPostalAddressStreetName = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.StreetName
-	dataRow.MainOrgPostalAddressCityName = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.CityName
-	dataRow.MainOrgPostalAddressPostalZone = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.PostalZone
-	dataRow.MainOrgPostalAddressCountrySubentityCode = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.CountrySubentityCode
-	dataRow.MainOrgPostalAddressCountryIdentificationCode = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.Country.IdentificationCode
-	dataRow.MainOrgPartyLegalEntityCompanyID = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PartyIdentification.ID
-	dataRow.MainOrgContactName = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.Contact.Name
-	dataRow.MainOrgContactTelephone = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.Contact.Telephone
-	dataRow.MainOrgContactTelefax = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.Contact.Telefax
-	dataRow.MainOrgContactElectronicMail = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.Contact.ElectronicMail
+	dataRow.MainOrgGroupLeadIndicator = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].GroupLeadIndicator
+	dataRow.MainOrgAcquiringCPBIndicator = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].AcquiringCPBIndicator
+	dataRow.MainOrgAwardingCPBIndicator = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].AwardingCPBIndicator
+	dataRow.MainOrgWebsiteURI = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.WebsiteURI
+	dataRow.MainOrgPartyIdentificationId = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PartyIdentification.ID
+	dataRow.MainOrgPartyName = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PartyName.Name
+	dataRow.MainOrgPostalAddressStreetName = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.StreetName
+	dataRow.MainOrgPostalAddressCityName = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.CityName
+	dataRow.MainOrgPostalAddressPostalZone = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.PostalZone
+	dataRow.MainOrgPostalAddressCountrySubentityCode = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.CountrySubentityCode
+	dataRow.MainOrgPostalAddressCountryIdentificationCode = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.Country.IdentificationCode
+	dataRow.MainOrgPartyLegalEntityCompanyID = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PartyIdentification.ID
+	dataRow.MainOrgContactName = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.Contact.Name
+	dataRow.MainOrgContactTelephone = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.Contact.Telephone
+	dataRow.MainOrgContactTelefax = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.Contact.Telefax
+	dataRow.MainOrgContactElectronicMail = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.Contact.ElectronicMail
 
-	dataRow.TenderingProcessProcedureCode = contractNotice.TenderingProcess.ProcedureCode
+	dataRow.TenderingProcessProcedureCode = procurementProcedure.TenderingProcess.ProcedureCode
 
 	// Set default procurement project data
-	dataRow.ProcurementProjectID = contractNotice.ProcurementProject.ID
-	dataRow.ProcurementProjectName = contractNotice.ProcurementProject.Name
-	dataRow.ProcurementProjectDescription = contractNotice.ProcurementProject.Description
-	dataRow.ProcurementProjectProcurementTypeCode = contractNotice.ProcurementProject.ProcurementTypeCode
-	dataRow.ProcurementProjectNote = contractNotice.ProcurementProject.Note
-	dataRow.ProcurementProjectMainCommodityClassification = contractNotice.ProcurementProject.MainCommodityClassification.ItemClassificationCode
+	dataRow.ProcurementProjectID = procurementProcedure.ProcurementProject.ID
+	dataRow.ProcurementProjectName = procurementProcedure.ProcurementProject.Name
+	dataRow.ProcurementProjectDescription = procurementProcedure.ProcurementProject.Description
+	dataRow.ProcurementProjectProcurementTypeCode = procurementProcedure.ProcurementProject.ProcurementTypeCode
+	dataRow.ProcurementProjectNote = procurementProcedure.ProcurementProject.Note
+	dataRow.ProcurementProjectMainCommodityClassification = procurementProcedure.ProcurementProject.MainCommodityClassification.ItemClassificationCode
 
 	// Now flatten the lot structure by creating several copies of the structure if necessary
-	for _, lot := range contractNotice.ProcurementProjectLot {
+	for _, lot := range procurementProcedure.ProcurementProjectLot {
 		dataRow.LotID = lot.ID
 		dataRow.LotName = lot.ProcurementProject.Name
 		dataRow.LotDescription = lot.ProcurementProject.Description
@@ -91,25 +91,25 @@ func ProcessJSON(jsonFilepath, targetFilepath string, csvSeparator string) error
 	return nil
 }
 
-func ReadJSON(filePath string) (convert.ContractNotice, error) {
-	// Create an instance of ContractNotice from contracting package
-	var contractNotice convert.ContractNotice
+func ReadJSON(filePath string) (convert.ProcurementProcedure, error) {
+	// Create an instance of ProcurementProcedure from contracting package
+	var procurementProcedure convert.ProcurementProcedure
 
 	// Open the JSON file
 	jsonFile, err := os.Open(filePath)
 	if err != nil {
-		return contractNotice, fmt.Errorf("failed to open json file: %v", err)
+		return procurementProcedure, fmt.Errorf("failed to open json file: %v", err)
 	}
 	defer jsonFile.Close()
 
 	// Unmarshal the JSON data into the struct
 	decoder := json.NewDecoder(jsonFile)
-	err = decoder.Decode(&contractNotice)
+	err = decoder.Decode(&procurementProcedure)
 	if err != nil {
-		return contractNotice, fmt.Errorf("failed to decode json file: %v", err)
+		return procurementProcedure, fmt.Errorf("failed to decode json file: %v", err)
 	}
 
-	return contractNotice, nil
+	return procurementProcedure, nil
 }
 
 // Generic CSV writer that appends a struct to a CSV file

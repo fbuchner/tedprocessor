@@ -25,25 +25,25 @@ func ProcessXML(xmlFilepath string, jsonFolderpath string, countryFilter string)
 	// Read the XML file
 	byteValue, _ := io.ReadAll(xmlFile)
 	// Unmarshal the XML into the struct
-	var contractNotice ContractNotice
-	err = xml.Unmarshal(byteValue, &contractNotice)
+	var procurementProcedure ProcurementProcedure
+	err = xml.Unmarshal(byteValue, &procurementProcedure)
 	if err != nil {
 		return fmt.Errorf("failed to extract xml data: %v", err)
 	}
 
-	// Make sure the ContractNotice XML format is valid, there are some exotic formats mixed into TED
-	if contractNotice.NoticeID == "" {
+	// Make sure the ProcurementProcedure XML format is valid, there are some exotic formats mixed into TED
+	if procurementProcedure.NoticeID == "" {
 		log.Warn().Str("XML file", xmlFilepath).Msg("Mismatch in XML schema, skipping file")
 	}
 
 	// Print the struct (for debugging purposes)
-	//fmt.Printf("%+v\n", contractNotice)
+	//fmt.Printf("%+v\n", procurementProcedure)
 
 	// Skip processing if the country filter does not match the realized location country
-	countryCode1 := contractNotice.ProcurementProject.RealizedLocation.Address.Country.IdentificationCode
+	countryCode1 := procurementProcedure.ProcurementProject.RealizedLocation.Address.Country.IdentificationCode
 	countryCode2 := ""
-	if len(contractNotice.UBLExtensions.UBLExtension) > 0 && len(contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization) > 0 {
-		countryCode2 = contractNotice.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.Country.IdentificationCode
+	if len(procurementProcedure.UBLExtensions.UBLExtension) > 0 && len(procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization) > 0 {
+		countryCode2 = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.Country.IdentificationCode
 	}
 	if countryFilter != "" && countryCode1 != countryFilter && countryCode2 != countryFilter {
 		log.Debug().Str("filepath", xmlFilepath).Str("Country code 1", countryCode1).Str("Country code 2", countryCode2).Msg("Skipping file due to country filter")
@@ -56,15 +56,15 @@ func ProcessXML(xmlFilepath string, jsonFolderpath string, countryFilter string)
 	filenameWithoutExt := strings.TrimSuffix(filenameWithExt, ext)
 	targetPath := filepath.Join(jsonFolderpath, filenameWithoutExt+".json")
 	// Write data out to JSON
-	writeJSON(contractNotice, targetPath)
+	writeJSON(procurementProcedure, targetPath)
 	log.Debug().Str("JSON path", targetPath).Msg("Writing JSON file")
 
 	return nil
 }
 
-func writeJSON(contractNotice ContractNotice, filePath string) error {
+func writeJSON(procurementProcedure ProcurementProcedure, filePath string) error {
 	// Convert the struct to JSON
-	jsonData, err := json.Marshal(contractNotice)
+	jsonData, err := json.Marshal(procurementProcedure)
 	if err != nil {
 		return fmt.Errorf("failed to convert object to json: %v", err)
 	}
