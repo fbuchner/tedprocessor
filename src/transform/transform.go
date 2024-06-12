@@ -23,6 +23,8 @@ func ProcessJSON(jsonFilepath, targetFilepath string, csvSeparator string) error
 
 	var dataRow DataRow
 
+	//TODO check if array empty in UBLExtensions
+
 	// Core attributes of the contract notice
 	dataRow.NoticeID = procurementProcedure.NoticeID
 	dataRow.IssueDate = procurementProcedure.IssueDate
@@ -32,23 +34,35 @@ func ProcessJSON(jsonFilepath, targetFilepath string, csvSeparator string) error
 	dataRow.NoticePublicationID = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Publication.NoticePublicationID
 	dataRow.ContractingActivityTypeCode = procurementProcedure.ContractingParty.ContractingActivity.ActivityTypeCode
 
-	//TODO check if array empty in UBLExtensions
-	dataRow.MainOrgGroupLeadIndicator = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].GroupLeadIndicator
-	dataRow.MainOrgAcquiringCPBIndicator = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].AcquiringCPBIndicator
-	dataRow.MainOrgAwardingCPBIndicator = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].AwardingCPBIndicator
-	dataRow.MainOrgWebsiteURI = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.WebsiteURI
-	dataRow.MainOrgPartyIdentificationId = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PartyIdentification.ID
-	dataRow.MainOrgPartyName = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PartyName.Name
-	dataRow.MainOrgPostalAddressStreetName = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.StreetName
-	dataRow.MainOrgPostalAddressCityName = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.CityName
-	dataRow.MainOrgPostalAddressPostalZone = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.PostalZone
-	dataRow.MainOrgPostalAddressCountrySubentityCode = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.CountrySubentityCode
-	dataRow.MainOrgPostalAddressCountryIdentificationCode = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PostalAddress.Country.IdentificationCode
-	dataRow.MainOrgPartyLegalEntityCompanyID = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.PartyIdentification.ID
-	dataRow.MainOrgContactName = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.Contact.Name
-	dataRow.MainOrgContactTelephone = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.Contact.Telephone
-	dataRow.MainOrgContactTelefax = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.Contact.Telefax
-	dataRow.MainOrgContactElectronicMail = procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization[0].Company.Contact.ElectronicMail
+	//Match the buyer main organization to the separately found organization data
+	var buyerOrgID string
+	for _, org := range procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization {
+		buyerOrgID = procurementProcedure.ContractingParty.Party.PartyIdentification.ID
+
+		if buyerOrgID != org.Company.PartyIdentification.ID {
+			continue
+		}
+
+		//dataRow.MainOrgGroupLeadIndicator = org.GroupLeadIndicator
+		//dataRow.MainOrgAcquiringCPBIndicator = org.AcquiringCPBIndicator
+		//dataRow.MainOrgAwardingCPBIndicator = org.AwardingCPBIndicator
+		dataRow.MainOrgPartyName = org.Company.PartyName.Name
+		dataRow.MainOrgWebsiteURI = org.Company.WebsiteURI
+		//dataRow.MainOrgPartyIdentificationId = org.Company.PartyIdentification.ID
+		dataRow.MainOrgPostalAddressStreetName = org.Company.PostalAddress.StreetName
+		dataRow.MainOrgPostalAddressCityName = org.Company.PostalAddress.CityName
+		dataRow.MainOrgPostalAddressPostalZone = org.Company.PostalAddress.PostalZone
+		//dataRow.MainOrgPostalAddressCountrySubentityCode = org.Company.PostalAddress.CountrySubentityCode
+		dataRow.MainOrgPostalAddressCountryIdentificationCode = org.Company.PostalAddress.Country.IdentificationCode
+		//dataRow.MainOrgPartyLegalEntityCompanyID = org.Company.PartyIdentification.ID
+		dataRow.MainOrgContactName = org.Company.Contact.Name
+		dataRow.MainOrgContactTelephone = org.Company.Contact.Telephone
+		dataRow.MainOrgContactTelefax = org.Company.Contact.Telefax
+		dataRow.MainOrgContactElectronicMail = org.Company.Contact.ElectronicMail
+
+		// assignment done, no further loop iterations required
+		break
+	}
 
 	dataRow.TenderingProcessProcedureCode = procurementProcedure.TenderingProcess.ProcedureCode
 
@@ -79,6 +93,55 @@ func ProcessJSON(jsonFilepath, targetFilepath string, csvSeparator string) error
 		// Use conditional assignment to not assign only a space as value if empty
 		if lot.ProcurementProject.PlannedPeriod.DurationMeasure.Value != "" {
 			dataRow.DurationMeasure = lot.ProcurementProject.PlannedPeriod.DurationMeasure.Value + " " + lot.ProcurementProject.PlannedPeriod.DurationMeasure.UnitCode
+		}
+
+		/*  here it gets a bit tricky - we are in a loop through the lots to create DataRows and want to assign the winning organization
+		1) first we check if there is a winning organization (and only then continue)
+		2) then we get the correct tendering party from the LotTenders
+		3) now we can get the organization ID from the according tendering party
+		4) so we look through the organizations to find the matching one
+		*/
+		if len(procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.NoticeResult.LotTenders) > 0 {
+			var targetTenderingPartyID string
+			var winningOrgID string
+			//get tendering party
+			for _, lotTender := range procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.NoticeResult.LotTenders {
+				if lotTender.TenderLot.ID == lot.ID {
+					targetTenderingPartyID = lotTender.TenderingPartyID.ID
+					break
+				}
+			}
+
+			for _, tenderingParty := range procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.NoticeResult.TenderingParties {
+				if targetTenderingPartyID == tenderingParty.ID {
+					winningOrgID = tenderingParty.Tenderer.ID
+				}
+			}
+
+			if winningOrgID != "" {
+				for _, org := range procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.Organizations.Organization {
+					if winningOrgID != org.Company.PartyIdentification.ID {
+						continue
+					}
+
+					dataRow.WinningOrgWebsiteURI = org.Company.WebsiteURI
+					dataRow.WinningOrgPartyIdentificationId = org.Company.PartyIdentification.ID
+					dataRow.WinningOrgPartyName = org.Company.PartyName.Name
+					dataRow.WinningOrgPostalAddressStreetName = org.Company.PostalAddress.StreetName
+					dataRow.WinningOrgPostalAddressCityName = org.Company.PostalAddress.CityName
+					dataRow.WinningOrgPostalAddressPostalZone = org.Company.PostalAddress.PostalZone
+					//dataRow.WinningOrgPostalAddressCountrySubentityCode = org.Company.PostalAddress.CountrySubentityCode
+					dataRow.WinningOrgPostalAddressCountryIdentificationCode = org.Company.PostalAddress.Country.IdentificationCode
+					dataRow.WinningOrgPartyLegalEntityCompanyID = org.Company.PartyIdentification.ID
+					dataRow.WinningOrgContactName = org.Company.Contact.Name
+					dataRow.WinningOrgContactTelephone = org.Company.Contact.Telephone
+					dataRow.WinningOrgContactTelefax = org.Company.Contact.Telefax
+					dataRow.WinningOrgContactElectronicMail = org.Company.Contact.ElectronicMail
+
+					break
+				}
+			}
+
 		}
 
 		// Add the dataRow item as a line in the CSV file

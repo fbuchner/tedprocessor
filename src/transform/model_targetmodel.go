@@ -1,7 +1,9 @@
 package transform
 
 // Target data model is a flat file model, no hierarchy (data table)
+// Uncommented lines are available but not used. Just activate if needed in here and in transform.go
 type DataRow struct {
+	// TODO add estimated value of procurement, also in XML extract
 	NoticeID                    string
 	IssueDate                   string
 	NoticeTypeCode              string
@@ -10,22 +12,22 @@ type DataRow struct {
 	NoticePublicationID         string
 	ContractingActivityTypeCode string
 
-	MainOrgGroupLeadIndicator                     string
-	MainOrgAcquiringCPBIndicator                  string
-	MainOrgAwardingCPBIndicator                   string
-	MainOrgWebsiteURI                             string
-	MainOrgPartyIdentificationId                  string
-	MainOrgPartyName                              string
-	MainOrgPostalAddressStreetName                string
-	MainOrgPostalAddressCityName                  string
-	MainOrgPostalAddressPostalZone                string
-	MainOrgPostalAddressCountrySubentityCode      string
+	//MainOrgGroupLeadIndicator                     string
+	//MainOrgAcquiringCPBIndicator                  string
+	//MainOrgAwardingCPBIndicator                   string
+	MainOrgPartyName  string
+	MainOrgWebsiteURI string
+	//MainOrgPartyIdentificationId                  string
+	MainOrgPostalAddressStreetName string
+	MainOrgPostalAddressCityName   string
+	MainOrgPostalAddressPostalZone string
+	//MainOrgPostalAddressCountrySubentityCode      string
 	MainOrgPostalAddressCountryIdentificationCode string
-	MainOrgPartyLegalEntityCompanyID              string
-	MainOrgContactName                            string
-	MainOrgContactTelephone                       string
-	MainOrgContactTelefax                         string
-	MainOrgContactElectronicMail                  string
+	//MainOrgPartyLegalEntityCompanyID              string
+	MainOrgContactName           string
+	MainOrgContactTelephone      string
+	MainOrgContactTelefax        string
+	MainOrgContactElectronicMail string
 
 	TenderingProcessProcedureCode string
 
@@ -50,4 +52,18 @@ type DataRow struct {
 	RealizedLocationAddressPostalZone                string
 	RealizedLocationAddressCountrySubentityCode      string
 	RealizedLocationAddressCountryIdentificationCode string
+
+	WinningOrgWebsiteURI              string
+	WinningOrgPartyIdentificationId   string
+	WinningOrgPartyName               string
+	WinningOrgPostalAddressStreetName string
+	WinningOrgPostalAddressCityName   string
+	WinningOrgPostalAddressPostalZone string
+	//WinningOrgPostalAddressCountrySubentityCode      string
+	WinningOrgPostalAddressCountryIdentificationCode string
+	WinningOrgPartyLegalEntityCompanyID              string
+	WinningOrgContactName                            string
+	WinningOrgContactTelephone                       string
+	WinningOrgContactTelefax                         string
+	WinningOrgContactElectronicMail                  string
 }

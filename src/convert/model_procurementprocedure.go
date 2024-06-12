@@ -29,6 +29,7 @@ type EformsExtension struct {
 	NoticeSubType NoticeSubType `xml:"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1 NoticeSubType"`
 	Organizations Organizations `xml:"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1 Organizations"`
 	Publication   Publication   `xml:"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1 Publication"`
+	NoticeResult  NoticeResult  `xml:"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1 NoticeResult"`
 }
 
 type NoticeSubType struct {
@@ -88,6 +89,33 @@ type Contact struct {
 
 type Publication struct {
 	NoticePublicationID string `xml:"http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1 NoticePublicationID"`
+}
+
+type NoticeResult struct {
+	LotTenders       []LotTender      `xml:"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1 LotTender"`
+	TenderingParties []TenderingParty `xml:"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1 TenderingParty"`
+}
+
+type LotTender struct {
+	TenderingPartyID TenderingPartyID `xml:"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1 TenderingParty"`
+	TenderLot        LotID            `xml:"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1 TenderLot"`
+}
+
+type TenderingPartyID struct {
+	ID string `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 ID"`
+}
+
+type LotID struct {
+	ID string `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 ID"`
+}
+
+type TenderingParty struct {
+	ID       string   `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 ID"`
+	Tenderer Tenderer `xml:"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1 Tenderer"`
+}
+
+type Tenderer struct {
+	ID string `xml:"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2 ID"`
 }
 
 type ContractingParty struct {
