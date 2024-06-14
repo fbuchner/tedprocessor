@@ -13,6 +13,7 @@ import (
 )
 
 // Processes a JSON file, appends result to target file
+// TODO add more logging
 func ProcessJSON(jsonFilepath, targetFilepath string, csvSeparator string) error {
 	log.Debug().Str("JSON file", jsonFilepath).Msg("Processing JSON file")
 
@@ -112,6 +113,7 @@ func ProcessJSON(jsonFilepath, targetFilepath string, csvSeparator string) error
 				}
 			}
 
+			//get winning org
 			for _, tenderingParty := range procurementProcedure.UBLExtensions.UBLExtension[0].ExtensionContent.EformsExtension.NoticeResult.TenderingParties {
 				if targetTenderingPartyID == tenderingParty.ID {
 					winningOrgID = tenderingParty.Tenderer.ID
