@@ -12,7 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func ProcessXML(xmlFilepath string, jsonFolderpath string, countryFilter string) error {
+func ProcessXML(xmlFilepath, jsonFolderpath, countryFilter string, deleteAfterProcessing bool) error {
 	log.Debug().Str("filepath", xmlFilepath).Msg("Processing XML file")
 
 	// Open the XML file
@@ -60,6 +60,13 @@ func ProcessXML(xmlFilepath string, jsonFolderpath string, countryFilter string)
 	// Write data out to JSON
 	writeJSON(procurementProcedure, targetPath)
 	log.Debug().Str("JSON path", targetPath).Msg("Writing JSON file")
+
+	if deleteAfterProcessing {
+		err := os.Remove(xmlFilepath)
+		if err != nil {
+			return fmt.Errorf("failed to remove xml file: %v", err)
+		}
+	}
 
 	return nil
 }

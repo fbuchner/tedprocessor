@@ -73,12 +73,13 @@ func main() {
 	if cfg.RunSteps.RunStepProcessXML {
 		log.Info().Msg("Starting processing of XML files.")
 
+		//iterate directory tree
 		err = filepath.Walk(cfg.XMLDir, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
 			if !info.IsDir() && strings.HasSuffix(strings.ToLower(info.Name()), ".xml") {
-				err = convert.ProcessXML(path, cfg.JSONDir, cfg.CountryFilter)
+				err = convert.ProcessXML(path, cfg.JSONDir, cfg.CountryFilter, cfg.DeleteAfterProcessing)
 				if err != nil {
 					return err
 				}
@@ -103,7 +104,7 @@ func main() {
 				return err
 			}
 			if !info.IsDir() && strings.HasSuffix(strings.ToLower(info.Name()), ".json") {
-				err = transform.ProcessJSON(path, cfg.ExtractedFile, cfg.CSVSeparator)
+				err = transform.ProcessJSON(path, cfg.ExtractedFile, cfg.CSVSeparator, cfg.DeleteAfterProcessing)
 				if err != nil {
 					return err
 				}

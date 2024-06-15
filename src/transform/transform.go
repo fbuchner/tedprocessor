@@ -14,7 +14,7 @@ import (
 
 // Processes a JSON file, appends result to target file
 // TODO add more logging
-func ProcessJSON(jsonFilepath, targetFilepath string, csvSeparator string) error {
+func ProcessJSON(jsonFilepath, targetFilepath, csvSeparator string, deleteAfterProcessing bool) error {
 	log.Debug().Str("JSON file", jsonFilepath).Msg("Processing JSON file")
 
 	procurementProcedure, err := ReadJSON(jsonFilepath)
@@ -150,6 +150,13 @@ func ProcessJSON(jsonFilepath, targetFilepath string, csvSeparator string) error
 		err = appendStructToCSV(targetFilepath, dataRow, csvSeparator)
 		if err != nil {
 			return fmt.Errorf("failed to append data row: %v", err)
+		}
+
+		if deleteAfterProcessing {
+			err := os.Remove(jsonFilepath)
+			if err != nil {
+				return fmt.Errorf("failed to remove json file: %v", err)
+			}
 		}
 	}
 
