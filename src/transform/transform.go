@@ -151,13 +151,6 @@ func ProcessJSON(jsonFilepath, targetFilepath, csvSeparator string, deleteAfterP
 		if err != nil {
 			return fmt.Errorf("failed to append data row: %v", err)
 		}
-
-		if deleteAfterProcessing {
-			err := os.Remove(jsonFilepath)
-			if err != nil {
-				return fmt.Errorf("failed to remove json file: %v", err)
-			}
-		}
 	}
 
 	return nil
@@ -182,6 +175,25 @@ func ReadJSON(filePath string) (convert.ProcurementProcedure, error) {
 	}
 
 	return procurementProcedure, nil
+}
+
+func RemoveFile(jsonFilepath string) error {
+	// Check if the file exists before trying to delete it
+	if _, err := os.Stat(jsonFilepath); os.IsNotExist(err) {
+		return fmt.Errorf("file does not exist: %v", jsonFilepath)
+	}
+
+	// Attempt to remove the file
+	err := os.Remove(jsonFilepath)
+	if err != nil {
+		// Double-check if the file indeed doesn't exist to handle race conditions
+		if os.IsNotExist(err) {
+			return nil // Ignore the error if the file is already deleted
+		}
+		return fmt.Errorf("failed to remove json file: %v", err)
+	}
+
+	return nil
 }
 
 // Generic CSV writer that appends a struct to a CSV file

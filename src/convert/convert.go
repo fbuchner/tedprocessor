@@ -61,13 +61,6 @@ func ProcessXML(xmlFilepath, jsonFolderpath, countryFilter string, deleteAfterPr
 	writeJSON(procurementProcedure, targetPath)
 	log.Debug().Str("JSON path", targetPath).Msg("Writing JSON file")
 
-	if deleteAfterProcessing {
-		err := os.Remove(xmlFilepath)
-		if err != nil {
-			return fmt.Errorf("failed to remove xml file: %v", err)
-		}
-	}
-
 	return nil
 }
 
@@ -93,5 +86,24 @@ func writeJSON(procurementProcedure ProcurementProcedure, filePath string) error
 	}
 
 	//fmt.Println("JSON data saved.")
+	return nil
+}
+
+func RemoveFile(xmlFilepath string) error {
+	// Check if the file exists before trying to delete it
+	if _, err := os.Stat(xmlFilepath); os.IsNotExist(err) {
+		return fmt.Errorf("file does not exist: %v", xmlFilepath)
+	}
+
+	// Attempt to remove the file
+	err := os.Remove(xmlFilepath)
+	if err != nil {
+		// Double-check if the file indeed doesn't exist to handle race conditions
+		if os.IsNotExist(err) {
+			return nil // Ignore the error if the file is already deleted
+		}
+		return fmt.Errorf("failed to remove xml file: %v", err)
+	}
+
 	return nil
 }

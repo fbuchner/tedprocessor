@@ -83,6 +83,12 @@ func main() {
 				if err != nil {
 					return err
 				}
+				if cfg.DeleteAfterProcessing {
+					err := convert.RemoveFile(path)
+					if err != nil {
+						return fmt.Errorf("failed to remove xml file: %v", err)
+					}
+				}
 			}
 			return nil
 		})
@@ -107,6 +113,12 @@ func main() {
 				err = transform.ProcessJSON(path, cfg.ExtractedFile, cfg.CSVSeparator, cfg.DeleteAfterProcessing)
 				if err != nil {
 					return err
+				}
+				if cfg.DeleteAfterProcessing {
+					err := transform.RemoveFile(path)
+					if err != nil {
+						return fmt.Errorf("failed to remove json file: %v", err)
+					}
 				}
 			}
 			return nil
